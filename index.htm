@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>App Treinador Pro</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; background: #2c3e50; color: white; }
+        /* Estilo da tela de login */
+        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        #app-content { display: none; }
+        nav { display: flex; background: #1a252f; position: sticky; top: 0; }
+        nav button { flex: 1; padding: 15px; border: none; color: white; background: #34495e; cursor: pointer; }
+        nav button.active { background: #27ae60; }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+        canvas { background: #27ae60; width: 100%; border: 4px solid white; border-radius: 5px; touch-action: none; display: block; margin: 0 auto; }
+        textarea, input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; box-sizing: border-box; }
+        button { background: #27ae60; color: white; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <h3>Acesso Restrito</h3>
+    <input type="password" id="senhaInput" placeholder="Digite a senha">
+    <button onclick="verificarSenha()">Entrar</button>
+</div>
+
+<div id="app-content">
+    <nav>
+        <button onclick="tab('prancheta')" id="btn-prancheta" class="active">Prancheta</button>
+        <button onclick="tab('atletas')" id="btn-atletas">Alunos</button>
+    </nav>
+
+    <div id="prancheta" class="tab-content active">
+        <canvas id="campo" width="400" height="600"></canvas>
+        <button onclick="enviarWhatsApp()" style="background:#25d366">Enviar Tática (WhatsApp)</button>
+        <button onclick="limparCampo()" style="background:#c0392b">Limpar Desenho</button>
+    </div>
+
+    <div id="atletas" class="tab-content">
+        <h3>Gestão de Atletas</h3>
+        <textarea id="listaAtletas" rows="6" placeholder="Nome - Série - Categoria..."></textarea>
+        <button onclick="salvar()">Guardar Lista</button>
+        <hr>
+        <h3>🎲 Gerador de Desafios</h3>
+        <button onclick="gerarDesafio()" style="background:#e67e22">Sortear Desafio</button>
+        <p id="resultadoDesafio" style="text-align:center; font-size: 1.2em; font-weight: bold;"></p>
+    </div>
+</div>
+
+<script>
+    // --- EDITE A SENHA AQUI ---
+    const SENHA_CORRETA = "absenhabé2026"; 
+    // --------------------------
+
+    function verificarSenha() {
+        const senhaDigitada = document.getElementById('senhaInput').value;
+        if (senhaDigitada === SENHA_CORRETA) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+        } else {
+            alert('Senha incorreta!');
+        }
+    }
+
+    // --- Resto do código original ---
+    const canvas = document.getElementById('campo');
+    const ctx = canvas.getContext('2d');
+    
+    function desenharCampo() {
+        ctx.strokeStyle = "white"; ctx.lineWidth = 5;
+        ctx.strokeRect(20, 20, 360, 560);
+        ctx.beginPath(); ctx.moveTo(20, 300); ctx.lineTo(380, 300); ctx.stroke();
+    }
+    desenharCampo();
+
+    function tab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    canvas.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        ctx.fillStyle = "yellow";
+        ctx.beginPath(); ctx.arc(t.clientX - rect.left, t.clientY - rect.top, 6, 0, Math.PI*2);
+        ctx.fill();
+    });
+
+    function limparCampo() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        desenharCampo();
+    }
+
+    const desafios = ["Perna não dominante!", "Máximo 3 toques!", "Transição rápida!", "Todos tocam na bola!", "Marcação pressão total!"];
+    function gerarDesafio() {
+        document.getElementById('resultadoDesafio').innerText = desafios[Math.floor(Math.random() * desafios.length)];
+    }
+
+    function salvar() {
+        localStorage.setItem('atletas', document.getElementById('listaAtletas').value);
+        alert('Lista guardada!');
+    }
+
+    window.onload = () => document.getElementById('listaAtletas').value = localStorage.getItem('atletas') || '';
+
+    function enviarWhatsApp() {
+        window.open('https://wa.me/5579999055301?text=Nova%20estratégia!');
+    }
+</script>
+</body>
+</html>
